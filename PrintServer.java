@@ -54,13 +54,31 @@ public class PrintServer implements PrintServerInterface
             System.out.println("Servidor pronto e rodando, pressione ctrl+c para terminar");
 			while(true){
 				// System.out.println("Rodando");
-				// if(printBuffer[primeiro] != null){
-					// System.out.println("Impressora 1 imprimiu: " + printBuffer[primeiro]);
-					// printBuffer[primeiro] = null;
-					// primeiro ++;
-					// if(primeiro > 2) primeiro = 0;
+				 if(obj.printBuffer[obj.primeiro]!=null){
+					 
+					 System.out.println("\n Impressora 1 imprimiu: "+ obj.printBuffer[obj.primeiro]);
+					 //obj.primeiro=obj.printBuffer.primeiro+1;
+					 obj.printBuffer[obj.primeiro] = null;
+					obj.primeiro ++;
+					 if(obj.primeiro > 2) {
+						 obj.primeiro = 0;
+						obj.vazio=0;
+					 }
+					 Thread.currentThread().sleep(1000);
 					
-				// }
+					}//else{
+						Thread.currentThread().sleep(1000);
+						System.out.print(".");
+						//System.out.println("Impressora 1 imprimiu: " + obj.primeiro);
+					 //obj.primeiro=obj.printBuffer.primeiro+1;
+					 //obj.printBuffer[obj.primeiro] = null;
+					//obj.primeiro ++;
+					// if(obj.primeiro > 2) {
+					//	 obj.primeiro = 0;
+					//	 obj.vazio=0;
+					 //}
+					//}
+					
 				// if(printBuffer[primeiro] != null){
 					// System.out.println("Impressora 2 imprimiu: " + printBuffer[primeiro]);
 					// printBuffer[primeiro] = null;
@@ -69,7 +87,8 @@ public class PrintServer implements PrintServerInterface
 					
 				// }
 				
-				System.out.println("Impressora 1 imprimiu: " + obj.printBuffer[obj.primeiro]);
+				//System.out.println("Impressora 1 imprimiu: " + obj.printBuffer[obj.printBuffer.length-1]);
+				
 				
 			}
         }
