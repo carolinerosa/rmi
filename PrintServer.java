@@ -2,20 +2,22 @@ import java.rmi.registry.Registry;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class PrintServer implements PrintServerInterface
 {
-	
-	public String[] printBuffer ;
-	public int primeiro; //endereco dp primeiro elemento que entrou no vetor. se o vetor esta cheio, o ultimo elemento dele eh esse valor -1
+	private final Lock lock = new ReentrantLock();
+	private String[] printBuffer ;
+	private int primeiro; //endereco dp primeiro elemento que entrou no vetor. se o vetor esta cheio, o ultimo elemento dele eh esse valor -1
 									//ou 4 se esse valor eh 0
-	public int vazio; //endereco do primeiro espaço vazio do vetor. -1 se não houver espaço vazio
+	private int vazio; //endereco do primeiro espaço vazio do vetor. -1 se não houver espaço vazio
 	
-	public static boolean printer1Running;
-	public static boolean printer2Running;
+	private static boolean printer1Running;
+	private static boolean printer2Running;
 	
-	public static String printer1Content;
-	public static String printer2Content;
+	private static String printer1Content;
+	private static String printer2Content;
 	
 	// private static Runnable printer = new Runnable() { //consumidor
         // public void run() {
@@ -36,17 +38,22 @@ public class PrintServer implements PrintServerInterface
 
     public String requestPrint(String s) 
 	{
-		if(vazio == -1){
-			return "Buffer cheio, tente mais tarde";
+		lock.lock();
+		try {
+			if(vazio == -1){
+				return "Buffer cheio, tente mais tarde";
+			}
+			printBuffer[vazio] = s;
+			vazio ++;
+			if(vazio == 3) vazio = 0;
+			if(vazio == primeiro) vazio = -1;
+			return "Seu arquivo foi adicionado ao buffer, aguarde enquanto ele eh impresso. vazio = " + vazio + "primeiro = " + primeiro ;
+		} finally {
+				lock.unlock();
 		}
-		printBuffer[vazio] = s;
-		vazio ++;
-		if(vazio == 3) vazio = 0;
-		if(vazio == primeiro) vazio = -1;
-		return "Seu arquivo foi adicionado ao buffer, aguarde enquanto ele eh impresso. vazio = " + vazio + "primeiro = " + primeiro ;
     }
 
-    public static void main(String args[]) 
+    public synchronized static void main(String args[]) 
 	{
 		try 
 		{
@@ -69,21 +76,31 @@ public class PrintServer implements PrintServerInterface
 					//System.out.println("Impressora 1 imprimiu: "+ obj.printBuffer[obj.primeiro]);
 					//obj.primeiro=obj.printBuffer.primeiro+1;
 					if(printer1Running == false){
-						printer1Content = obj.printBuffer[obj.primeiro];
-						obj.printBuffer[obj.primeiro] = null;		//tira um objeto da fila(colocar um lock aqui)
-						obj.primeiro ++;
-						if(obj.primeiro > 2) {
-							obj.primeiro = 0;
+						obj.lock.lock();
+						try{
+							printer1Content = obj.printBuffer[obj.primeiro];
+							obj.printBuffer[obj.primeiro] = null;		//tira um objeto da fila(colocar um lock aqui)
+							obj.primeiro ++;
+							if(obj.primeiro > 2) {
+								obj.primeiro = 0;
+							}
+							System.out.println("Job Enviado para a impressora 1");
+						}finally{
+							obj.lock.unlock();
 						}
-						System.out.println("Job Enviado para a impressora 1");
 					}else if(printer2Running == false){
-						printer2Content = obj.printBuffer[obj.primeiro];
-						obj.printBuffer[obj.primeiro] = null;		//tira um objeto da fila(colocar um lock aqui)
-						obj.primeiro ++;
-						if(obj.primeiro > 2) {
-							obj.primeiro = 0;
+						obj.lock.lock();
+						try{
+							printer2Content = obj.printBuffer[obj.primeiro];
+							obj.printBuffer[obj.primeiro] = null;		//tira um objeto da fila(colocar um lock aqui)
+							obj.primeiro ++;
+							if(obj.primeiro > 2) {
+								obj.primeiro = 0;
+							}
+							System.out.println("Job Enviado para a impressora 2");
+						}finally{
+							obj.lock.unlock();
 						}
-						System.out.println("Job Enviado para a impressora 2");
 					}
 					
 				}//else{
