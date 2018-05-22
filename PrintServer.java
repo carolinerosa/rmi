@@ -56,7 +56,7 @@ public class PrintServer implements PrintServerInterface
 				// System.out.println("Rodando");
 				 if(obj.printBuffer[obj.primeiro]!=null){
 					 
-					 System.out.println("\n Impressora 1 imprimiu: "+ obj.printBuffer[obj.primeiro]);
+					 System.out.println("Impressora 1 imprimiu: "+ obj.printBuffer[obj.primeiro]);
 					 //obj.primeiro=obj.printBuffer.primeiro+1;
 					 obj.printBuffer[obj.primeiro] = null;
 					obj.primeiro ++;
@@ -68,7 +68,7 @@ public class PrintServer implements PrintServerInterface
 					
 					}//else{
 						Thread.currentThread().sleep(1000);
-						System.out.print(".");
+						//System.out.print(".");
 						//System.out.println("Impressora 1 imprimiu: " + obj.primeiro);
 					 //obj.primeiro=obj.printBuffer.primeiro+1;
 					 //obj.printBuffer[obj.primeiro] = null;
