@@ -11,6 +11,12 @@ public class PrintServer implements PrintServerInterface
 									//ou 4 se esse valor eh 0
 	public int vazio; //endereco do primeiro espaço vazio do vetor. -1 se não houver espaço vazio
 	
+	public static boolean printer1Running;
+	public static boolean printer2Running;
+	
+	public static String printer1Content;
+	public static String printer2Content;
+	
 	// private static Runnable printer = new Runnable() { //consumidor
         // public void run() {
             // try{
@@ -52,23 +58,36 @@ public class PrintServer implements PrintServerInterface
             Registry registry = LocateRegistry.getRegistry();
             registry.bind("PrintServer", stub);
 
+			new Thread(printer1).start();
+			new Thread(printer2).start();
+			
             System.out.println("Servidor pronto e rodando, pressione ctrl+c para terminar");
 			while(true){
 				// System.out.println("Rodando");
-				 if(obj.printBuffer[obj.primeiro]!=null){
+				if(obj.printBuffer[obj.primeiro]!=null){
 					 
-					 System.out.println("Impressora 1 imprimiu: "+ obj.printBuffer[obj.primeiro]);
-					 //obj.primeiro=obj.printBuffer.primeiro+1;
-					 obj.printBuffer[obj.primeiro] = null;
-					obj.primeiro ++;
-					 if(obj.primeiro > 2) {
-						 obj.primeiro = 0;
-						obj.vazio=0;
-					 }
-					 Thread.currentThread().sleep(1000);
+					//System.out.println("Impressora 1 imprimiu: "+ obj.printBuffer[obj.primeiro]);
+					//obj.primeiro=obj.printBuffer.primeiro+1;
+					if(printer1Running == false){
+						printer1Content = obj.printBuffer[obj.primeiro];
+						obj.printBuffer[obj.primeiro] = null;		//tira um objeto da fila(colocar um lock aqui)
+						obj.primeiro ++;
+						if(obj.primeiro > 2) {
+							obj.primeiro = 0;
+						}
+						System.out.println("Job Enviado para a impressora 1");
+					}else if(printer2Running == false){
+						printer2Content = obj.printBuffer[obj.primeiro];
+						obj.printBuffer[obj.primeiro] = null;		//tira um objeto da fila(colocar um lock aqui)
+						obj.primeiro ++;
+						if(obj.primeiro > 2) {
+							obj.primeiro = 0;
+						}
+						System.out.println("Job Enviado para a impressora 2");
+					}
 					
-					}//else{
-						Thread.currentThread().sleep(1000);
+				}//else{
+				Thread.currentThread().sleep(1000);
 						//System.out.print(".");
 						//System.out.println("Impressora 1 imprimiu: " + obj.primeiro);
 					 //obj.primeiro=obj.printBuffer.primeiro+1;
@@ -99,4 +118,49 @@ public class PrintServer implements PrintServerInterface
             e.printStackTrace();
         }
     }
+	
+	private static Runnable printer1 = new Runnable() {
+        public void run() {
+            try{
+                while(true){
+					System.out.println("Impressora 1 esperando... ");
+					if(printer1Content != null){
+						printer1Running = true;
+						System.out.println("Impressora 1 imprimindo... ");
+						Thread.currentThread().sleep(10000);
+						System.out.println("Impressora 1 imprimiu: " + printer1Content);
+						printer1Content = null;
+						//Adicionar o job concluido num historico
+						printer1Running = false;
+						
+					}
+					Thread.currentThread().sleep(1000);
+				}
+            } catch (Exception e){}
+ 
+        }
+    };
+	
+	private static Runnable printer2 = new Runnable() {
+        public void run() {
+            try{
+                while(true){
+					if(printer2Content != null){
+						printer2Running = true;
+						System.out.println("Impressora 2 imprimindo... ");
+						Thread.currentThread().sleep(10000);
+						System.out.println("Impressora 2 imprimiu: " + printer2Content);
+						printer2Content = null;
+						//Adicionar o job concluido num historico
+						printer2Running = false;
+						
+					}
+					Thread.currentThread().sleep(1000);
+				}
+				
+            } catch (Exception e){}
+ 
+        }
+    };
+	
 }
