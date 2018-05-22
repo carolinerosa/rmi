@@ -8,7 +8,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class PrintServer implements PrintServerInterface
 {
 	private final Lock lock = new ReentrantLock();
-	private String[] printBuffer ;
+	private Job[] printBuffer ;
 	private int primeiro; //endereco dp primeiro elemento que entrou no vetor. se o vetor esta cheio, o ultimo elemento dele eh esse valor -1
 									//ou 4 se esse valor eh 0
 	private int vazio; //endereco do primeiro espaço vazio do vetor. -1 se não houver espaço vazio
@@ -33,7 +33,7 @@ public class PrintServer implements PrintServerInterface
 	
     public PrintServer() 
 	{
-		printBuffer = new String[3];
+		printBuffer = new Job[3];
 		primeiro = 0; //endereco dp primeiro elemento que entrou no vetor. se o vetor esta cheio, o ultimo elemento dele eh esse valor -1
 									//ou 4 se esse valor eh 0
 		vazio = 0; //endereco do primeiro espaço vazio do vetor. -1 se não houver espaço vazio
@@ -42,22 +42,30 @@ public class PrintServer implements PrintServerInterface
 		jobCounter = 1;
 	}
 
-    public String requestPrint(String s) 
+    public Job requestPrint(String s, int c) 
 	{
 		lock.lock();
 		try {
 			if(vazio == -1){
-				return "Buffer cheio, tente mais tarde";
+				return null;
 			}
-			printBuffer[vazio] = s;
+			printBuffer[vazio] = new Job(jobCounter, c, s);
+			Job resp = printBuffer[vazio];
+			jobCounter ++;
 			vazio ++;
 			if(vazio == 3) vazio = 0;
 			if(vazio == primeiro) vazio = -1;
-			return "Seu arquivo foi adicionado ao buffer, aguarde enquanto ele eh impresso. vazio = " + vazio + "primeiro = " + primeiro ;
+			return resp;
 		} finally {
 				lock.unlock();
 		}
     }
+	
+	public int login(){
+		int resp = idCounter;
+		idCounter ++;
+		return resp;
+	}
 
     public synchronized static void main(String args[]) 
 	{
@@ -84,8 +92,9 @@ public class PrintServer implements PrintServerInterface
 					if(printer1Running == false){
 						obj.lock.lock();
 						try{
-							printer1Content = obj.printBuffer[obj.primeiro];
+							printer1Content = obj.printBuffer[obj.primeiro].getConteudo();
 							obj.printBuffer[obj.primeiro] = null;		//tira um objeto da fila(colocar um lock aqui)
+							//jogar pro historico;
 							obj.primeiro ++;
 							if(obj.primeiro > 2) {
 								obj.primeiro = 0;
@@ -97,7 +106,7 @@ public class PrintServer implements PrintServerInterface
 					}else if(printer2Running == false){
 						obj.lock.lock();
 						try{
-							printer2Content = obj.printBuffer[obj.primeiro];
+							printer2Content = obj.printBuffer[obj.primeiro].getConteudo();
 							obj.printBuffer[obj.primeiro] = null;		//tira um objeto da fila(colocar um lock aqui)
 							obj.primeiro ++;
 							if(obj.primeiro > 2) {
