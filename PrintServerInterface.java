@@ -4,5 +4,6 @@ import java.rmi.RemoteException;
 public interface PrintServerInterface extends Remote 
 {
 	// Metodo em que um usuario solicita que um arquivo seja impresso
-    String requestPrint(String s) throws RemoteException;
+    Job requestPrint(String s, int c) throws RemoteException;
+	int login() throws RemoteException;
 }
