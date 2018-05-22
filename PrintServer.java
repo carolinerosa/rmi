@@ -35,8 +35,9 @@ public class PrintServer implements PrintServerInterface
 		}
 		printBuffer[vazio] = s;
 		vazio ++;
-		if(vazio == primeiro || vazio == 3) vazio = -1;
-		return "Seu arquivo foi adicionado ao buffer, aguarde enquanto ele eh impresso";
+		if(vazio == 3) vazio = 0;
+		if(vazio == primeiro) vazio = -1;
+		return "Seu arquivo foi adicionado ao buffer, aguarde enquanto ele eh impresso. vazio = " + vazio + "primeiro = " + primeiro ;
     }
 
     public static void main(String args[]) 
