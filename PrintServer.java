@@ -13,6 +13,9 @@ public class PrintServer implements PrintServerInterface
 									//ou 4 se esse valor eh 0
 	private int vazio; //endereco do primeiro espaço vazio do vetor. -1 se não houver espaço vazio
 	
+	private int idCounter;
+	private int jobCounter;
+	
 	private static boolean printer1Running;
 	private static boolean printer2Running;
 	
@@ -34,6 +37,9 @@ public class PrintServer implements PrintServerInterface
 		primeiro = 0; //endereco dp primeiro elemento que entrou no vetor. se o vetor esta cheio, o ultimo elemento dele eh esse valor -1
 									//ou 4 se esse valor eh 0
 		vazio = 0; //endereco do primeiro espaço vazio do vetor. -1 se não houver espaço vazio
+		
+		idCounter = 1;
+		jobCounter = 1;
 	}
 
     public String requestPrint(String s) 
