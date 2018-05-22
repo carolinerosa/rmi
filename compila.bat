@@ -1,2 +1,2 @@
-javac AloMundo.java AloMundoServidor.java AloMundoCliente.java
+javac PrintServerInterface.java PrintServer.java PrintClient.java
 PAUSE
