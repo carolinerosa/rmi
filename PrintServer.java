@@ -6,13 +6,27 @@ import java.rmi.server.UnicastRemoteObject;
 public class PrintServer implements PrintServerInterface
 {
 	
-	public static String[] printBuffer = new String[3];
-	public static int primeiro = 0; //endereco dp primeiro elemento que entrou no vetor. se o vetor esta cheio, o ultimo elemento dele eh esse valor -1
+	public String[] printBuffer ;
+	public int primeiro; //endereco dp primeiro elemento que entrou no vetor. se o vetor esta cheio, o ultimo elemento dele eh esse valor -1
 									//ou 4 se esse valor eh 0
-	public static int vazio = 0; //endereco do primeiro espaço vazio do vetor. -1 se não houver espaço vazio
+	public int vazio; //endereco do primeiro espaço vazio do vetor. -1 se não houver espaço vazio
+	
+	// private static Runnable printer = new Runnable() { //consumidor
+        // public void run() {
+            // try{
+                
+            // } catch (Exception e){}
+         // }
+    // };
+	
 	
     public PrintServer() 
-	{}
+	{
+		printBuffer = new String[3];
+		primeiro = 0; //endereco dp primeiro elemento que entrou no vetor. se o vetor esta cheio, o ultimo elemento dele eh esse valor -1
+									//ou 4 se esse valor eh 0
+		vazio = 0; //endereco do primeiro espaço vazio do vetor. -1 se não houver espaço vazio
+	}
 
     public String requestPrint(String s) 
 	{
@@ -29,7 +43,7 @@ public class PrintServer implements PrintServerInterface
 	{
 		try 
 		{
-		
+			
             PrintServer obj = new PrintServer();
 
             PrintServerInterface stub = (PrintServerInterface) UnicastRemoteObject.exportObject(obj, 0); 
@@ -39,6 +53,23 @@ public class PrintServer implements PrintServerInterface
 
             System.out.println("Servidor pronto e rodando, pressione ctrl+c para terminar");
 			while(true){
+				// System.out.println("Rodando");
+				// if(printBuffer[primeiro] != null){
+					// System.out.println("Impressora 1 imprimiu: " + printBuffer[primeiro]);
+					// printBuffer[primeiro] = null;
+					// primeiro ++;
+					// if(primeiro > 2) primeiro = 0;
+					
+				// }
+				// if(printBuffer[primeiro] != null){
+					// System.out.println("Impressora 2 imprimiu: " + printBuffer[primeiro]);
+					// printBuffer[primeiro] = null;
+					// primeiro ++;
+					// if(primeiro > 2) primeiro = 0;
+					
+				// }
+				
+				System.out.println("Impressora 1 imprimiu: " + obj.printBuffer[obj.primeiro]);
 				
 			}
         }
