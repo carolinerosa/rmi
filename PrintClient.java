@@ -6,8 +6,8 @@ import java.util.ArrayList;
 public class PrintClient
 {
 	
-	private int id;
-	private ArrayList<Job> jobs = new ArrayList();
+	private static int id;
+	private static ArrayList<Job> jobs = new ArrayList<Job>();
 	
     private PrintClient() 
 	{}
@@ -31,21 +31,48 @@ public class PrintClient
 			boolean sair = false;
 			
 			while(!sair){
+				
+						System.out.print( "Digite o que voce deseja fazer.\np para imprimir\nl para log de impressao.\nj exibir a posicao de um job.\ns para sair. " );
+						caso = scanner.nextLine();
 				switch(caso){
 					case "p" : 
 						System.out.print( "Digite o que voce quer imprimir: " );
 						input = scanner.nextLine();
 						
 						Job resposta = stub.requestPrint(input, id);
+						if(resposta!=null){
 						jobs.add(resposta);
 						// Aqui a gente exibe o fruto produzido por esse lindo e maravilho sistema distribuído
 						// Passo importante 4: Verificar resposta dada pelo método remoto.
 						System.out.println("resposta: " + resposta);
-						sair = true;
+						}else{
+							System.out.println("Buffer cheio");
+						}
+						//sair = true;
 						break;
-					//case "s" 
-					
+					case "l" : 
+					System.out.println("Log:");
+						for(Job j : jobs){
+							System.out.println(j.toString());
+						}
+						break;
+					case "s" : 
+						sair = true;
+						System.out.println("Encerrando a aplicacao");
+						break;
+					case "j" :
+						System.out.print( "Digite o job que voce quer saber a posicao: " );
+						int num = scanner.nextInt();
+						num = stub.getPosition(num);
+						if(num != -1) {
+							System.out.println( "O seu job esta na posicao: " + num );
+						}
+						else {
+							System.out.println( "Seu job ja foi impresso" );
+						}
+						break;
 					default: 
+						System.out.println("Comando nao identificado tente novamente");
 						break;
 				}
 			}
