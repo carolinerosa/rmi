@@ -16,19 +16,14 @@ public class PrintServer implements PrintServerInterface
 	private int idCounter;
 	private int jobCounter;
 	
+	
 	private static boolean printer1Running;
 	private static boolean printer2Running;
 	
 	private static String printer1Content;
 	private static String printer2Content;
 	
-	// private static Runnable printer = new Runnable() { //consumidor
-        // public void run() {
-            // try{
-                
-            // } catch (Exception e){}
-         // }
-    // };
+	
 	
 	
     public PrintServer() 
@@ -61,10 +56,34 @@ public class PrintServer implements PrintServerInterface
 		}
     }
 	
-	public int login(){
-		int resp = idCounter;
-		idCounter ++;
+	public int getPosition(int j){
+		lock.lock();
+		try {
+		int resp=-1;
+		for(int i = 0; i <= 2; i++){
+			if(printBuffer[i]!=null){
+			if(printBuffer[i].getId() == j){
+				if( i >= primeiro) resp = i - primeiro;
+				else resp = 2 - primeiro + i;
+			}
+			}
+		}
 		return resp;
+		}finally{
+		lock.unlock();
+		}
+	}
+	
+	public int login(){
+		
+		//lock.lock();
+		try {
+			int resp = idCounter;
+			idCounter ++;
+			return resp;
+		} finally {
+				//lock.unlock();
+		}
 	}
 
     public synchronized static void main(String args[]) 
@@ -84,22 +103,21 @@ public class PrintServer implements PrintServerInterface
 			
             System.out.println("Servidor pronto e rodando, pressione ctrl+c para terminar");
 			while(true){
-				// System.out.println("Rodando");
+				
 				if(obj.printBuffer[obj.primeiro]!=null){
 					 
-					//System.out.println("Impressora 1 imprimiu: "+ obj.printBuffer[obj.primeiro]);
-					//obj.primeiro=obj.printBuffer.primeiro+1;
 					if(printer1Running == false){
 						obj.lock.lock();
 						try{
 							printer1Content = obj.printBuffer[obj.primeiro].getConteudo();
 							obj.printBuffer[obj.primeiro] = null;		//tira um objeto da fila(colocar um lock aqui)
 							//jogar pro historico;
+							if(obj.vazio == -1) obj.vazio = obj.primeiro;
 							obj.primeiro ++;
 							if(obj.primeiro > 2) {
 								obj.primeiro = 0;
 							}
-							System.out.println("Job Enviado para a impressora 1");
+							System.out.println("Job Enviado para a impressora 1 primeiro, vazio: " + obj.primeiro + " " + obj.vazio);
 						}finally{
 							obj.lock.unlock();
 						}
@@ -108,38 +126,19 @@ public class PrintServer implements PrintServerInterface
 						try{
 							printer2Content = obj.printBuffer[obj.primeiro].getConteudo();
 							obj.printBuffer[obj.primeiro] = null;		//tira um objeto da fila(colocar um lock aqui)
+							if(obj.vazio == -1) obj.vazio = obj.primeiro;
 							obj.primeiro ++;
 							if(obj.primeiro > 2) {
 								obj.primeiro = 0;
 							}
-							System.out.println("Job Enviado para a impressora 2");
+							System.out.println("Job Enviado para a impressora 2 primeiro, vazio: " + obj.primeiro + " " + obj.vazio);
 						}finally{
 							obj.lock.unlock();
 						}
 					}
 					
-				}//else{
+				}
 				Thread.currentThread().sleep(1000);
-						//System.out.print(".");
-						//System.out.println("Impressora 1 imprimiu: " + obj.primeiro);
-					 //obj.primeiro=obj.printBuffer.primeiro+1;
-					 //obj.printBuffer[obj.primeiro] = null;
-					//obj.primeiro ++;
-					// if(obj.primeiro > 2) {
-					//	 obj.primeiro = 0;
-					//	 obj.vazio=0;
-					 //}
-					//}
-					
-				// if(printBuffer[primeiro] != null){
-					// System.out.println("Impressora 2 imprimiu: " + printBuffer[primeiro]);
-					// printBuffer[primeiro] = null;
-					// primeiro ++;
-					// if(primeiro > 2) primeiro = 0;
-					
-				// }
-				
-				//System.out.println("Impressora 1 imprimiu: " + obj.printBuffer[obj.printBuffer.length-1]);
 				
 				
 			}
@@ -155,14 +154,13 @@ public class PrintServer implements PrintServerInterface
         public void run() {
             try{
                 while(true){
-					System.out.println("Impressora 1 esperando... ");
+					
 					if(printer1Content != null){
 						printer1Running = true;
 						System.out.println("Impressora 1 imprimindo... ");
 						Thread.currentThread().sleep(10000);
 						System.out.println("Impressora 1 imprimiu: " + printer1Content);
 						printer1Content = null;
-						//Adicionar o job concluido num historico
 						printer1Running = false;
 						
 					}
@@ -183,7 +181,6 @@ public class PrintServer implements PrintServerInterface
 						Thread.currentThread().sleep(10000);
 						System.out.println("Impressora 2 imprimiu: " + printer2Content);
 						printer2Content = null;
-						//Adicionar o job concluido num historico
 						printer2Running = false;
 						
 					}
