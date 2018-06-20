@@ -1,0 +1,45 @@
+Linux
+A instalação e configuração do PATH do Java deste post é independente de distribuição Linux, pois é mostrado os passos manualmente, porém foi testado na distro Slackware :-)
+Acesse o site da Oracle: http://www.oracle.com/technetwork/java/javase/downloads/java-se-jdk-7-download-432154.html 
+Escolha a versão Linux x86 - Compressed Binary e aceite a licença do Java, marcando no rádio button para liberar o download. Logue-se como root e crie o diretório java dentro do diretório opt na raiz do sistema de arquivo segue os passos:
+1)$su - [ENTER]
+2)Password: [digite a senha de root]
+3)Entando no diretório que fez o download
+$tar -xzvf jdk-7u3-linux-i586.tar.gz irá gerar o diretório jdk1.7.0_03
+4)#mkdir /opt/java
+Mova o arquivo, que extraiu para dentro do diretório java criado acima
+5)#mv jdk1.7.0_03 /opt/java
+6)cd /opt/java
+criar link simbólico
+#ln -s jdk1.7.0_03 jdk
+configuração do PATH
+Edite o arquivo /etc/profile com seu editor favorito
+7)#vim /etc/profile
+adicione no início do arquivo
+
+export JAVA_HOME="/opt/java/jdk"
+export CLASSPATH="$JAVA_HOME/lib":$CLASSPATH
+export PATH="$JAVA_HOME/bin":$PATH
+export MANPATH="$JAVA_HOME/man":$MANPATH
+Salve e saia do editor! [# No vi/vim faça ESQ + :x]
+Criando link simbólico
+#ln -s /opt/java/jdk/bin/java /usr/local/bin/
+#ln -s /opt/java/jdk/bin/javac /usr/local/bin/
+Linkando para bibliotecas do Mozilla Firefox
+#ln -s /opt/java/jdk/jre/plugin/i386/ns7/libjavaplugin_oji.so /usr/lib/firefox/plugins/
+#ln -s /opt/java/jdk/jre/lib/i386/libnpjp2.so /usr/lib/firefox/plugins/ 
+
+
+Para testar o funcionamento do java, digite no terminal: $java -version e $javac [se aparecer uma lista de opções, é sinal, que foi instalado corretamente, caso contrário, revise os passos e tente novamente].
+
+Agora faça o teste no terminal como segue abaixo:
+[reginaldo@Saitam ~$]$ java -version
+java version "1.7.0_03"
+Java(TM) SE Runtime Environment (build 1.7.0_03-b04)
+Java HotSpot(TM) Client VM (build 22.1-b02, mixed mode)
+
+[reginaldo@Saitam ~$]javac Teste.java
+[reginaldo@Saitam ~$]java Teste 
+Teste Java no Linux-Slackware!
+
+Feito!
